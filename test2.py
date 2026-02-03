@@ -116,7 +116,7 @@ def apply_style():
     }}
 
     div[class^="stSelectbox"] {{
-        position: fixed;
+        position: absolute;
         top: 170px;
         left: 50%;
         transform: translateX(-50%);
