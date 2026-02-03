@@ -13,94 +13,53 @@ if "page" not in st.session_state:
 
 
 # ================= PAGE 1 : INTRO VIDÉO =================
-# if st.session_state.page == 1:
-#    with open("video_ouverture_3.mp4", "rb") as f:
-#        video_base64 = base64.b64encode(f.read()).decode()
+if st.session_state.page == 1:
+    video_base64 = ""
+    # On vérifie si le fichier existe bien (attention au nom exact !)
+    nom_video = "video_ouverture_3.mp4" 
+    
+    try:
+        with open(nom_video, "rb") as f:
+            video_base64 = base64.b64encode(f.read()).decode()
+            
+        # --- SI LA VIDÉO EST TROUVÉE, ON L'AFFICHE ---
+        st.markdown(
+            f"""
+            <style>
+            .block-container {{ padding: 0 !important; margin: 0 !important; max-width: 100% !important; }}
+            header, footer {{ display: none !important; }}
+            .video-bg {{
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                z-index: 0; overflow: hidden;
+            }}
+            .video-bg video {{ width: 100vw; height: 100vh; object-fit: cover; }}
+            div.stButton {{
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                z-index: 9999; display: flex; align-items: center; justify-content: center;
+            }}
+            div.stButton > button {{
+                width: 100vw !important; height: 100vh !important;
+                background-color: transparent !important; color: transparent !important;
+                border: none !important; cursor: pointer !important;
+            }}
+            </style>
 
+            <div class="video-bg">
+                <video autoplay loop muted playsinline>
+                    <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+                </video>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-# --- VERSION SÉCURISÉE ---
-video_base64 = ""
-try:
-    with open("video_ouverture.mp4", "rb") as f:
-        video_base64 = base64.b64encode(f.read()).decode()
-except FileNotFoundError:
-    st.warning("Vidéo d'intro introuvable. Cliquez sur le bouton pour continuer.")
-    st.session_state.page = 2 # Force le passage à la page 2 si la vidéo manque
+        # Le bouton invisible par-dessus
+        if st.button("ENTRER", key="skip_btn"):
+            st.session_state.page = 2
+            st.rerun()
 
-    # --- CSS SPÉCIAL PAGE 1 ---
-    st.markdown(
-        f"""
-        <style>
-        /* Nettoyage de l'interface de base */
-        .block-container {{ padding: 0 !important; margin: 0 !important; max-width: 100% !important; }}
-        header, footer {{ display: none !important; }}
-       
-        /* 1. LA VIDÉO (Au fond) */
-        .video-bg {{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            overflow: hidden;
-        }}
-        .video-bg video {{
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-        }}
-
-
-        /* 2. LE BOUTON (Au dessus) */
-        /* On cible le conteneur du bouton Streamlit */
-        div.stButton {{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 999999; /* Toujours au-dessus */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }}
-
-
-        /* On cible le bouton lui-même */
-        div.stButton > button {{
-            width: 100vw !important;
-            height: 100vh !important;
-            background-color: transparent !important; /* Fond invisible */
-            color: transparent !important; /* Texte invisible */
-            border: none !important;
-            outline: none !important;
-            cursor: pointer !important; /* Force le curseur 'main' */
-        }}
-       
-        /* Au survol, on garde tout invisible */
-        div.stButton > button:hover, div.stButton > button:active, div.stButton > button:focus {{
-            background-color: transparent !important;
-            color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }}
-        </style>
-
-
-        <div class="video-bg">
-            <video autoplay loop muted playsinline>
-                <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
-            </video>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-    # --- LE BOUTON INVISIBLE ---
-    # On met du texte pour garantir que la zone de clic existe, mais le CSS le cache.
-    if st.button("CLIQUE_ICI_POUR_ENTRER", key="skip_btn"):
+    except FileNotFoundError:
+        # Si le fichier est absent, on ne bloque pas l'utilisateur, on passe direct à la suite
         st.session_state.page = 2
         st.rerun()
 
