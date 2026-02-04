@@ -15,24 +15,48 @@ if "page" not in st.session_state:
 # ================= PAGE 1 : INTRO VIDÉO =================
 if st.session_state.page == 1:
     video_base64 = ""
-    # On vérifie si le fichier existe bien (attention au nom exact !)
     nom_video = "video_ouverture_3.mp4" 
     
     try:
         with open(nom_video, "rb") as f:
             video_base64 = base64.b64encode(f.read()).decode()
             
-        # --- SI LA VIDÉO EST TROUVÉE, ON L'AFFICHE ---
         st.markdown(
             f"""
             <style>
             .block-container {{ padding: 0 !important; margin: 0 !important; max-width: 100% !important; }}
             header, footer {{ display: none !important; }}
+            
             .video-bg {{
                 position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                 z-index: 0; overflow: hidden;
             }}
             .video-bg video {{ width: 100vw; height: 100vh; object-fit: cover; }}
+            
+            /* --- NOUVEAU : L'écriteau "Clic pour passer" --- */
+            .skip-hint {{
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000; /* Doit être au-dessus de tout */
+                color: white;
+                font-family: 'Arial', sans-serif;
+                font-size: 14px;
+                background: rgba(0, 0, 0, 0.4);
+                padding: 8px 15px;
+                border-radius: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                pointer-events: none; /* Pour que le clic passe à travers vers le gros bouton */
+                animation: pulse 2s infinite;
+            }}
+
+            @keyframes pulse {{
+                0% {{ opacity: 0.5; }}
+                50% {{ opacity: 1; }}
+                100% {{ opacity: 0.5; }}
+            }}
+            /* -------------------------------------------- */
+
             div.stButton {{
                 position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                 z-index: 9999; display: flex; align-items: center; justify-content: center;
@@ -49,17 +73,17 @@ if st.session_state.page == 1:
                     <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
                 </video>
             </div>
+            
+            <div class="skip-hint">🎬 Clic n'importe où pour entrer</div>
             """,
             unsafe_allow_html=True
         )
 
-        # Le bouton invisible par-dessus
         if st.button("ENTRER", key="skip_btn"):
             st.session_state.page = 2
             st.rerun()
 
     except FileNotFoundError:
-        # Si le fichier est absent, on ne bloque pas l'utilisateur, on passe direct à la suite
         st.session_state.page = 2
         st.rerun()
 
